@@ -4,10 +4,13 @@ var cwidth = $("canvas").width();
 var cheight = $("canvas").height();
 var face_width, face_height;
 
+var imgtotal = 0;
 var loadImage = function(url, location) {
   var i = new Image();
   i.onload = function() {
     ctx.drawImage(i, location[0], location[1], face_width, face_height);
+    imgtotal++;
+    console.log(imgtotal);
   };
   i.src = '/faces/' + url;
 };
@@ -113,7 +116,7 @@ $.getJSON('/country.geojson', function (gj) {
     });
 
     var totalpix = cwidth * cheight;
-    var pix_per_face = totalpix / (faces.length - 1) / 3;
+    var pix_per_face = totalpix / (faces.length - 1) / 3.5;
     // 3 width : 4 height ratio
     var pix_unit = Math.ceil(Math.pow(pix_per_face / 12, 0.5));
     face_width = pix_unit * 3;

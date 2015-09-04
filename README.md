@@ -1,18 +1,20 @@
 ## faces-map
 
-Current: fill a rectangle with photo thumbnails
+<img src="https://raw.githubusercontent.com/mapmeld/faces-map/master/minifiedmap.png"/>
 
-Goal: fill a GeoJSON shape with photo thumbnails
+Fill a GeoJSON shape with photo thumbnails
+
+Goal: use imagemagick to shrink images to better size, output image directly from node-canvas
 
 Created for the 2015 Myanmar elections
 
 ## Usage
 
-Put many images in the faces directory
+Put many images in the faces directory, then:
 
 ```
 npm install
-npm map output.png
+npm start
 ```
 
 ## License
