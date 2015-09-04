@@ -10,7 +10,6 @@ var loadImage = function(url, location) {
   i.onload = function() {
     ctx.drawImage(i, location[0], location[1], face_width, face_height);
     imgtotal++;
-    console.log(imgtotal);
   };
   i.src = '/faces/' + url;
 };
@@ -41,6 +40,25 @@ $.getJSON('/country.geojson', function (gj) {
   console.log(JSON.stringify(gj));
   */
 
+  function ptinpoly(point, vs) {
+    // ray-casting algorithm based on
+    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+
+    var x = point[0], y = point[1];
+
+    var inside = false;
+    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+        var xi = vs[i][0], yi = vs[i][1];
+        var xj = vs[j][0], yj = vs[j][1];
+
+        var intersect = ((yi > y) != (yj > y))
+            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+
+    return inside;
+};
+
   // bounds = [west, south, east, north]
   function findBounds(bounds, coordinates) {
     for (var c = 0; c < coordinates.length; c++) {
@@ -65,14 +83,27 @@ $.getJSON('/country.geojson', function (gj) {
     return [Math.round(x / 3), Math.round(y / 3) + 2200];
   }
 
+  function pttoll (pt) {
+    var x = pt[0] * 3 / cwidth * (bounds[2] - bounds[0]);
+    var y = (pt[1] - 2200) * 3 / cheight * (bounds[3] - bounds[1]);
+
+    x += bounds[0];
+    y = bounds[3] - y;
+    console.log([x, y]);
+    return [x, y];
+  }
+
+  var gjpoints = [];
   function mapFeatures(coordinates) {
     if (typeof coordinates[0][0] === 'number') {
       var start = lltopt(coordinates[0]);
+      gjpoints = [start];
       ctx.moveTo(start[0], start[1]);
       ctx.beginPath();
 
       for (var c = 1; c < coordinates.length; c++) {
         var pt = lltopt(coordinates[c]);
+        gjpoints.push(pt);
         ctx.lineTo(pt[0], pt[1]);
         ctx.moveTo(pt[0], pt[1]);
       }
@@ -116,22 +147,23 @@ $.getJSON('/country.geojson', function (gj) {
     });
 
     var totalpix = cwidth * cheight;
-    var pix_per_face = totalpix / (faces.length - 1) / 3.5;
+    var pix_per_face = totalpix / (faces.length - 1) / 4.25;
     // 3 width : 4 height ratio
     var pix_unit = Math.ceil(Math.pow(pix_per_face / 12, 0.5));
     face_width = pix_unit * 3;
     face_height = pix_unit * 4;
 
-    var cursor = [findLeftBound(face_height / 2), 0];
+    var cursor = [findLeftBound(face_height / 2), Math.round(face_height * 1.5)];
     var rightBound = findRightBound(face_height / 2);
+    var inClearing = false;
 
     for (var f = 0; f < faces.length; f++) {
       if (faces[f].indexOf("README") > -1) {
         continue;
       }
-      loadImage(faces[f], cursor.concat([]));
-      cursor[0] += face_width;
-      if (cursor[0] >= rightBound) {
+      if (cursor[0] + face_width >= rightBound) {
+        inClearing = false;
+        loadImage(faces[f], cursor.concat([]));
         cursor[1] += face_height;
         cursor[0] = findLeftBound(cursor[1] + Math.ceil(face_height / 2));
         if (!cursor[0]) {
@@ -139,7 +171,18 @@ $.getJSON('/country.geojson', function (gj) {
           break;
         }
         rightBound = findRightBound(cursor[1] + Math.ceil(face_height / 2));
+      } else if (!ptinpoly([cursor[0] + face_width, cursor[1] + face_height / 2], gjpoints)) {
+        if (inClearing) {
+          f--;
+        } else {
+          loadImage(faces[f], cursor.concat([]));
+          inClearing = true;
+        }
+      } else {
+        inClearing = false;
+        loadImage(faces[f], cursor.concat([]));
       }
+      cursor[0] += face_width;
     }
   });
 });

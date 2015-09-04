@@ -10,9 +10,19 @@ Created for the 2015 Myanmar elections
 
 ## Usage
 
-Put many images in the faces directory, then:
+Put a GeoJSON FeatureCollection as static/country.geojson
 
+Put many images in the static/faces directory. Run imagemagick to make them smaller
+
+```bash
+brew install imagemagick
+cd static/faces
+mogrify -path ./ -resize 30% -format jpg *.png
 ```
+
+Run this to see the map:
+
+```bash
 npm install
 npm start
 ```
