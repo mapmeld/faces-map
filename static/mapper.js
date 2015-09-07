@@ -11,7 +11,9 @@ var loadImage = function(url, location) {
     ctx.drawImage(i, location[0], location[1], face_width, face_height);
     imgtotal++;
   };
-  i.src = '/faces/' + url;
+  setTimeout(function() {
+    i.src = '/faces/' + url;
+  }, Math.ceil(Math.random() * 550));
 };
 
 $.getJSON('/country.geojson', function (gj) {
@@ -127,7 +129,7 @@ $.getJSON('/country.geojson', function (gj) {
         return px - Math.ceil(face_width / 2);
       }
     }
-    return findLeftBound(y + 30);
+    return null;
 
   }
   function findRightBound (y) {
@@ -138,7 +140,7 @@ $.getJSON('/country.geojson', function (gj) {
         return px + Math.ceil(face_width / 2);
       }
     }
-    return findRightBound(y + 30);
+    return null;
   }
 
   $.getJSON("/all", function (faces) {
@@ -147,7 +149,7 @@ $.getJSON('/country.geojson', function (gj) {
     });
 
     var totalpix = cwidth * cheight;
-    var pix_per_face = totalpix / (faces.length - 1) / 4.25;
+    var pix_per_face = totalpix / (faces.length - 1) / 4;
     // 3 width : 4 height ratio
     var pix_unit = Math.ceil(Math.pow(pix_per_face / 12, 0.5));
     face_width = pix_unit * 3;
@@ -166,7 +168,11 @@ $.getJSON('/country.geojson', function (gj) {
         loadImage(faces[f], cursor.concat([]));
         cursor[1] += face_height;
         cursor[0] = findLeftBound(cursor[1] + Math.ceil(face_height / 2));
-        if (!cursor[0]) {
+        if (cursor[0] === null) {
+          console.log((f+1) + "/" + faces.length + " photos loaded");
+          break;
+        }
+        if (!cursor[0] && cursor[0] !== 0) {
           console.log(f + " / " + faces.length);
           break;
         }

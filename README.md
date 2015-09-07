@@ -17,7 +17,8 @@ Put many images in the static/faces directory. Run imagemagick to make them smal
 ```bash
 brew install imagemagick
 cd static/faces
-mogrify -path ./ -resize 30% -format jpg *.png
+mogrify -path ./ -resize 20% -format jpg *.png
+rm *.png
 ```
 
 Run this to see the map:
