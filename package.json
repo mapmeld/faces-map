@@ -2,19 +2,21 @@
   "name": "faces-map",
   "version": "2.0.0",
   "description": "Fill the area of a map with a set of photo thumbnails",
-  "main": "index.js",
+  "main": "cli.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node cli.js"
   },
   "keywords": [
     "faces",
     "map",
-    "myanmar"
+    "myanmar",
+    "geojson",
+    "visualization"
   ],
   "dependencies": {
     "canvas": "^1.2.8",
     "node-static": "^0.7.7"
   },
-  "author": "The Asia Foundation",
+  "author": "Nick Doiron <ndoiron@mapmeld.com>",
   "license": "MIT"
 }
