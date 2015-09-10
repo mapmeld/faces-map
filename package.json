@@ -1,7 +1,7 @@
 {
   "name": "faces-map",
-  "version": "1.0.0",
-  "description": "Fill the area of a shape with a set of photo thumbnails",
+  "version": "2.0.0",
+  "description": "Fill the area of a map with a set of photo thumbnails",
   "main": "index.js",
   "scripts": {
     "start": "node server.js"
@@ -12,6 +12,7 @@
     "myanmar"
   ],
   "dependencies": {
+    "canvas": "^1.2.8",
     "node-static": "^0.7.7"
   },
   "author": "The Asia Foundation",

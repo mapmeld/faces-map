@@ -16,7 +16,7 @@ var loadImage = function(url, location) {
   }, Math.ceil(Math.random() * 550));
 };
 
-$.getJSON('/country.geojson', function (gj) {
+$.getJSON('/country.json', function (gj) {
   /*
   function dedupe(coordinates) {
     var outcoord = [];
@@ -82,17 +82,7 @@ $.getJSON('/country.geojson', function (gj) {
   function lltopt (lnglat) {
     var x = (lnglat[0] - bounds[0]) / (bounds[2] - bounds[0]) * cwidth;
     var y = (bounds[3] - lnglat[1]) / (bounds[3] - bounds[1]) * cheight;
-    return [Math.round(x / 3), Math.round(y / 3) + 2200];
-  }
-
-  function pttoll (pt) {
-    var x = pt[0] * 3 / cwidth * (bounds[2] - bounds[0]);
-    var y = (pt[1] - 2200) * 3 / cheight * (bounds[3] - bounds[1]);
-
-    x += bounds[0];
-    y = bounds[3] - y;
-    console.log([x, y]);
-    return [x, y];
+    return [Math.round(x / 3) + 100, Math.round(y / 3) + 2430];
   }
 
   var gjpoints = [];
@@ -120,75 +110,77 @@ $.getJSON('/country.geojson', function (gj) {
   //ctx.strokeWidth = '4px';
   mapFeatures(gj.features[0].geometry.coordinates);
 
-  var canvasdata = ctx.getImageData(0, 0, cwidth, cheight).data;
-  function findLeftBound (y) {
-    for (var px = 0; px < cwidth; px++) {
-      var relativepx = 4 * ((cwidth * y) + px);
-      if (canvasdata[relativepx + 3] > 0) {
-        // drawn area
-        return px - Math.ceil(face_width / 2);
-      }
-    }
-    return null;
+  setTimeout(function() {
+	  var canvasdata = ctx.getImageData(0, 0, cwidth, cheight).data;
+	  function findLeftBound (y) {
+		for (var px = 0; px < cwidth; px++) {
+		  var relativepx = 4 * ((cwidth * y) + px);
+		  if (canvasdata[relativepx + 3] > 0) {
+			// drawn area
+			return px - Math.ceil(face_width / 2);
+		  }
+		}
+		return null;
 
-  }
-  function findRightBound (y) {
-    for (var px = cwidth; px >= 0; px--) {
-      var relativepx = 4 * ((cwidth * y) + px);
-      if (canvasdata[relativepx + 3] > 0) {
-        // drawn area
-        return px + Math.ceil(face_width / 2);
-      }
-    }
-    return null;
-  }
+	  }
+	  function findRightBound (y) {
+		for (var px = cwidth; px >= 0; px--) {
+		  var relativepx = 4 * ((cwidth * y) + px);
+		  if (canvasdata[relativepx + 3] > 0) {
+			// drawn area
+			return px + Math.ceil(face_width / 2);
+		  }
+		}
+		return null;
+	  }
 
-  $.getJSON("/all", function (faces) {
-    faces.sort(function() {
-      return Math.random() - 0.5;
-    });
+	  $.getJSON("/all", function (faces) {
+		faces.sort(function() {
+		  return Math.random() - 0.5;
+		});
 
-    var totalpix = cwidth * cheight;
-    var pix_per_face = totalpix / (faces.length - 1) / 4;
-    // 3 width : 4 height ratio
-    var pix_unit = Math.ceil(Math.pow(pix_per_face / 12, 0.5));
-    face_width = pix_unit * 3;
-    face_height = pix_unit * 4;
+		var totalpix = cwidth * cheight;
+		var pix_per_face = totalpix / (faces.length - 1) / 4.25;
+		// 3 width : 4 height ratio
+		var pix_unit = Math.ceil(Math.pow(pix_per_face / 12, 0.5));
+		face_width = pix_unit * 3;
+		face_height = pix_unit * 4;
 
-    var cursor = [findLeftBound(face_height / 2), Math.round(face_height * 1.5)];
-    var rightBound = findRightBound(face_height / 2);
-    var inClearing = false;
+		var cursor = [findLeftBound(face_height / 2), Math.round(face_height * 1.5)];
+		var rightBound = findRightBound(face_height / 2);
+		var inClearing = false;
 
-    for (var f = 0; f < faces.length; f++) {
-      if (faces[f].indexOf("README") > -1) {
-        continue;
-      }
-      if (cursor[0] + face_width >= rightBound) {
-        inClearing = false;
-        loadImage(faces[f], cursor.concat([]));
-        cursor[1] += face_height;
-        cursor[0] = findLeftBound(cursor[1] + Math.ceil(face_height / 2));
-        if (cursor[0] === null) {
-          console.log((f+1) + "/" + faces.length + " photos loaded");
-          break;
-        }
-        if (!cursor[0] && cursor[0] !== 0) {
-          console.log(f + " / " + faces.length);
-          break;
-        }
-        rightBound = findRightBound(cursor[1] + Math.ceil(face_height / 2));
-      } else if (!ptinpoly([cursor[0] + face_width, cursor[1] + face_height / 2], gjpoints)) {
-        if (inClearing) {
-          f--;
-        } else {
-          loadImage(faces[f], cursor.concat([]));
-          inClearing = true;
-        }
-      } else {
-        inClearing = false;
-        loadImage(faces[f], cursor.concat([]));
-      }
-      cursor[0] += face_width;
-    }
-  });
+		for (var f = 0; f < faces.length; f++) {
+		  if (faces[f].indexOf("README") > -1) {
+			continue;
+		  }
+		  if (cursor[0] + face_width >= rightBound) {
+			inClearing = false;
+			loadImage(faces[f], cursor.concat([]));
+			cursor[1] += face_height;
+			cursor[0] = findLeftBound(cursor[1] + Math.ceil(face_height / 2));
+			if (cursor[0] === null) {
+			  console.log((f+1) + "/" + faces.length + " photos loaded");
+			  break;
+			}
+			if (!cursor[0] && cursor[0] !== 0) {
+			  console.log(f + " / " + faces.length);
+			  break;
+			}
+			rightBound = findRightBound(cursor[1] + Math.ceil(face_height / 2));
+		  } else if (!ptinpoly([cursor[0] + face_width, cursor[1] + face_height / 2], gjpoints)) {
+			if (inClearing) {
+			  f--;
+			} else {
+			  loadImage(faces[f], cursor.concat([]));
+			  inClearing = true;
+			}
+		  } else {
+			inClearing = false;
+			loadImage(faces[f], cursor.concat([]));
+		  }
+		  cursor[0] += face_width;
+		}
+	  });
+  }, 500);
 });

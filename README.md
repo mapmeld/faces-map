@@ -4,13 +4,11 @@
 
 Fill a GeoJSON shape with photo thumbnails
 
-Goal: use imagemagick to shrink images to better size, output image directly from node-canvas
-
 Created for the 2015 Myanmar elections
 
 ## Usage
 
-Put a GeoJSON FeatureCollection as static/country.geojson
+Put a GeoJSON FeatureCollection as static/country.json
 
 Put many images in the static/faces directory. Run imagemagick to make them smaller
 
@@ -21,12 +19,21 @@ mogrify -path ./ -resize 20% -format jpg *.png
 rm *.png
 ```
 
-Run this to see the map:
+Run this to see the map on http://localhost:8080
 
 ```bash
 npm install
 npm start
 ```
+
+Run this to create an image from the command line
+
+```bash
+npm install
+node cli.js
+```
+
+Output is map.png
 
 ## License
 
