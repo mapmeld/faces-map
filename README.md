@@ -1,5 +1,7 @@
 ## faces-map
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/mapmeld/faces-map.svg)](https://greenkeeper.io/)
+
 <img src="https://raw.githubusercontent.com/mapmeld/faces-map/master/minifiedmap.png"/>
 
 Fill a GeoJSON shape with photo thumbnails
